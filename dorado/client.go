@@ -87,7 +87,7 @@ func NewClientDefaultToken(localIPs, remoteIPs []string, username, password, por
 	if len(password) == 0 {
 		return nil, errors.New("password is required")
 	}
-	if len(localIPs) == 0 || len(remoteIPs) == 0 {
+	if len(localIPs) == 0 {
 		return nil, errors.New("IPs is required")
 	}
 
@@ -108,9 +108,12 @@ func NewClientDefaultToken(localIPs, remoteIPs []string, username, password, por
 		return nil, fmt.Errorf("failed to create Local Device: %w", err)
 	}
 
-	remoteDevice, err := newDevice(remoteIPs, username, password, httpClient, logger)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create Remote Device: %w", err)
+	var remoteDevice *Device
+	if len(remoteIPs) > 0 {
+		remoteDevice, err = newDevice(remoteIPs, username, password, httpClient, logger)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create Remote Device: %w", err)
+		}
 	}
 
 	c := &Client{

@@ -55,9 +55,12 @@ func (c *Client) SetToken() error {
 	if err != nil {
 		return fmt.Errorf("failed to set token in local device: %w", err)
 	}
-	err = c.RemoteDevice.setToken()
-	if err != nil {
-		return fmt.Errorf("failed to set token in remote device: %w", err)
+
+	if c.RemoteDevice != nil {
+		err = c.RemoteDevice.setToken()
+		if err != nil {
+			return fmt.Errorf("failed to set token in remote device: %w", err)
+		}
 	}
 
 	return nil

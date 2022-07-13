@@ -27,6 +27,10 @@ func main() {
 }
 
 func truncateAllVolume(ctx context.Context, client *dorado.Client) error {
+	if client.RemoteDevice == nil {
+		return nil, errors.New("Remote IPs is required")
+	}
+	
 	volumes, err := client.GetHyperMetroPairs(ctx, nil)
 	if err != nil && err != dorado.ErrHyperMetroPairNotFound {
 		return err

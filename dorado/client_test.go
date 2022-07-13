@@ -33,9 +33,11 @@ func setup() (client *Client, mux *http.ServeMux, serverURL string, teardown fun
 	if err != nil {
 		log.Fatalf("failed to set baseURL in local devive: %s", err)
 	}
-	err = client.RemoteDevice.setBaseURL(server.URL, DefaultDeviceID)
-	if err != nil {
-		log.Fatalf("failed to set baseURL in remote devive: %s", err)
+	if client.RemoteDevice != nil {
+		err = client.RemoteDevice.setBaseURL(server.URL, DefaultDeviceID)
+		if err != nil {
+			log.Fatalf("failed to set baseURL in remote devive: %s", err)
+		}
 	}
 
 	return client, mux, serverURL, server.Close

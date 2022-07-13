@@ -13,6 +13,10 @@ import (
 
 // CreateVolumeRaw create blank HyperMetroPair
 func (c *Client) CreateVolumeRaw(ctx context.Context, name uuid.UUID, capacityGB int, storagePoolName, hyperMetroDomainID string) (*HyperMetroPair, error) {
+	if c.RemoteDevice == nil {
+		return nil, errors.New("Remote IPs is required")
+	}
+
 	// create volume (= hypermetro enabled lun)
 	localLun, err := c.LocalDevice.CreateLUN(ctx, name, capacityGB, storagePoolName)
 	if err != nil {
@@ -34,6 +38,10 @@ func (c *Client) CreateVolumeRaw(ctx context.Context, name uuid.UUID, capacityGB
 
 // CreateVolumeFromSource create HyperMetroPair to copy from sourceHyperMetroPairID
 func (c *Client) CreateVolumeFromSource(ctx context.Context, name uuid.UUID, capacityGB int, storagePoolName, hyperMetroDomainID string, sourceHyperMetroPairID string) (*HyperMetroPair, error) {
+	if c.RemoteDevice == nil {
+		return nil, errors.New("Remote IPs is required")
+	}
+
 	source, err := c.GetHyperMetroPair(ctx, sourceHyperMetroPairID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get source HyperMetroPair: %w", err)
@@ -120,7 +128,10 @@ func (d *Device) CreateLUNFromSourceByLUNClone(ctx context.Context, sourceLUNID 
 
 // CreateLUNFromSourceByLUNCopy create lun from source lun by LUN Copy.
 func (d *Device) CreateLUNFromSourceByLUNCopy(ctx context.Context, sourceLUNID int, name uuid.UUID, capacityGB int, storagePoolName string) (*LUN, error) {
-	snapshotName := uuid.NewV4()
+	snapshotName, err := uuid.NewV4()
+	if err != nil {
+		return nil, err
+	}
 
 	snapshot, err := d.CreateSnapshotWithWait(ctx, sourceLUNID, snapshotName, "")
 	if err != nil {
@@ -163,6 +174,11 @@ func (d *Device) CreateLUNFromSourceByLUNCopy(ctx context.Context, sourceLUNID i
 
 // DeleteVolume delete HyperMetroPair
 func (c *Client) DeleteVolume(ctx context.Context, hyperMetroPairID string) error {
+	if c.RemoteDevice == nil {
+		return errors.New("Remote IPs is required")
+	}
+
+
 	// 1: delete HyperMetro Pair
 	// 2: delete LUN Group Associate
 	// 3: delete LUN
@@ -230,6 +246,10 @@ func (c *Client) DeleteVolume(ctx context.Context, hyperMetroPairID string) erro
 
 // ExtendVolume expand HyperMetroPair
 func (c *Client) ExtendVolume(ctx context.Context, hyperMetroPairID string, newVolumeSizeGb int) error {
+	if c.RemoteDevice == nil {
+		return errors.New("Remote IPs is required")
+	}
+
 	// 1: Suspend HyperMetro Pair
 	// 2: Expand LUN
 	// 3: Re-sync HyperMetro Pair
@@ -266,6 +286,10 @@ func (c *Client) ExtendVolume(ctx context.Context, hyperMetroPairID string, newV
 
 // AttachVolume create mapping to host
 func (c *Client) AttachVolume(ctx context.Context, hyperMetroPairID, hostname, iqn string) error {
+	if c.RemoteDevice == nil {
+		return errors.New("Remote IPs is required")
+	}
+
 	volume, err := c.GetHyperMetroPair(ctx, hyperMetroPairID)
 	if err != nil {
 		return fmt.Errorf("failed to get volume information: %w", err)
@@ -340,6 +364,10 @@ func (d *Device) AttachVolume(ctx context.Context, portgroupName, hostname, iqn 
 
 // DetachVolume delete mapping from host
 func (c *Client) DetachVolume(ctx context.Context, hyperMetroPairID string) error {
+	if c.RemoteDevice == nil {
+		return errors.New("Remote IPs is required")
+	}
+
 	volume, err := c.GetHyperMetroPair(ctx, hyperMetroPairID)
 	if err != nil {
 		return fmt.Errorf("failed to get hypermetro pair: %w", err)

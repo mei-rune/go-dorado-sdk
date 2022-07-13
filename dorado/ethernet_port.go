@@ -114,7 +114,9 @@ func (c *Client) GetPortalIPAddresses(ctx context.Context, localPortgroupID, rem
 	if err != nil {
 		return nil, fmt.Errorf("failed to get local portal IP: %w", err)
 	}
-
+	if c.RemoteDevice == nil {
+		return localIPs, nil
+	}
 	remoteIPs, err := c.RemoteDevice.GetPortalIPAddresses(ctx, remotePortgroupID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get remote portal IP: %w", err)
