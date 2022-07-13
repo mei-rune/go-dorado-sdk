@@ -7,7 +7,6 @@ import (
 	"fmt"
 )
 
-// PowerOff create lun from source lun by LUN Clone.
 func (d *Device) PowerOff(ctx context.Context, superAdminpassword string)  error {
 	spath := "/SYSTEM/POWEROFF"
 
@@ -17,7 +16,7 @@ func (d *Device) PowerOff(ctx context.Context, superAdminpassword string)  error
 	if err != nil {
 		return fmt.Errorf(ErrCreatePostValue+": %w", err)
 	}
-	req, err := d.newRequest(ctx, "POST", spath, bytes.NewBuffer(jb))
+	req, err := d.newRequest(ctx, "PUT", spath, bytes.NewBuffer(jb))
 	if err != nil {
 		return fmt.Errorf(ErrCreateRequest+": %w", err)
 	}
@@ -28,4 +27,26 @@ func (d *Device) PowerOff(ctx context.Context, superAdminpassword string)  error
 	}
 
 	return nil
+}
+
+func (d *Device) Reboot(ctx context.Context, superAdminpassword string)  error {
+  spath := "/SYSTEM/REBOOT"
+
+  jb, err := json.Marshal(map[string]interface{}{
+    "IMPORTANTPSW": superAdminpassword,
+  })
+  if err != nil {
+    return fmt.Errorf(ErrCreatePostValue+": %w", err)
+  }
+  req, err := d.newRequest(ctx, "PUT", spath, bytes.NewBuffer(jb))
+  if err != nil {
+    return fmt.Errorf(ErrCreateRequest+": %w", err)
+  }
+
+  data := map[string]interface{}{}
+  if err = d.requestWithRetry(req, &data, DefaultHTTPRetryCount); err != nil {
+    return fmt.Errorf(ErrRequestWithRetry+": %w", err)
+  }
+
+  return nil
 }
