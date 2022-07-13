@@ -178,7 +178,6 @@ func (c *Client) DeleteVolume(ctx context.Context, hyperMetroPairID string) erro
 		return errors.New("Remote IPs is required")
 	}
 
-
 	// 1: delete HyperMetro Pair
 	// 2: delete LUN Group Associate
 	// 3: delete LUN
