@@ -1,4 +1,4 @@
-package dorado
+package dorado // import "github.com/lovi-cloud/go-dorado-sdk/dorado"
 
 import (
 	"context"
